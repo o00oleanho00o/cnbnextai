@@ -29,9 +29,9 @@ const capabilities = [
 ];
 
 const projects = [
-  { index: '01', tag: 'BUSINESS AI', title: 'Company OS', text: 'Nền tảng điều phối quotation, tender và tài liệu dự án cho doanh nghiệp.', tone: 'mint', meta: 'Evidence · Approval · Traceability', image: '/media/company-os.jpg' },
-  { index: '02', tag: 'INDUSTRIAL AI', title: 'Engineering systems', text: 'AI workflow kết nối operator, thiết bị, CAD và các policy an toàn.', tone: 'amber', meta: 'CAD · BOM · Safety', image: '/media/engineering-systems.jpg' },
-  { index: '03', tag: 'AI PRODUCT STUDIO', title: 'Products people use', text: 'Studio cho giáo dục, truyện, voice và video với trải nghiệm trọn vẹn.', tone: 'blue', meta: 'Prototype · Product · Experience', image: '/media/ai-products.jpg' },
+  { index: '01', tag: 'BUSINESS SYSTEMS', title: 'CNB ERP / CRM', text: 'Không gian làm việc hợp nhất cho bán hàng, cơ hội, khách hàng và vận hành doanh nghiệp.', tone: 'mint', meta: 'CRM · Workflow · Operations', image: '/media/cnb-sales-workflow.jpg' },
+  { index: '02', tag: 'OPERATIONS AI', title: 'Workflow & governance', text: 'Biến kế hoạch, công việc và nhịp báo cáo thành một hệ thống rõ việc, rõ tiến độ.', tone: 'amber', meta: 'Roadmap · Task board · Reporting', image: '/media/cnb-roadmap.jpg' },
+  { index: '03', tag: 'INDUSTRIAL SOFTWARE', title: 'Engineering delivery', text: 'Dự toán, BOQ và dữ liệu kỹ thuật được kết nối để đội ngũ triển khai nhanh và kiểm soát tốt hơn.', tone: 'blue', meta: 'BOQ · Procurement · Evidence', image: '/media/cnb-estimate.jpg' },
 ];
 
 function App() {
@@ -162,14 +162,14 @@ function SectionIntro({ kicker, title, text, light = false }) {
 }
 
 function ProjectCard({ index, tag, title, text, tone, meta, image }) {
-  return <article className={`project-card project-${tone}`}><div className="project-visual"><img className="project-image" src={image} alt="" loading="lazy" /><span className="project-index">{index}</span><div className="project-chip"><Boxes size={15} /> {tag}</div></div><div className="project-copy"><p className="project-tag">{tag}</p><h3>{title}</h3><p>{text}</p><div className="project-meta"><span>{meta}</span><ArrowUpRight size={17} /></div></div></article>;
+  return <article className={`project-card project-${tone}`}><div className="project-visual"><img className="project-image" src={image} alt={`${title} - giao diện sản phẩm CNB Next AI`} loading="lazy" /><span className="project-index">{index}</span><div className="project-chip"><Boxes size={15} /> {tag}</div></div><div className="project-copy"><p className="project-tag">{tag}</p><h3>{title}</h3><p>{text}</p><div className="project-meta"><span>{meta}</span><ArrowUpRight size={17} /></div></div></article>;
 }
 
 function SystemVisual() {
   return <figure className="system-visual" aria-label="Hạ tầng phần mềm và dữ liệu cho hệ thống AI">
     <div className="visual-label visual-label-top"><span>AI / SOFTWARE / SYSTEMS</span><span>CNB NEXT AI</span></div>
     <div className="visual-photo">
-      <img src="/media/company-os.jpg" alt="Hạ tầng máy chủ cho một hệ thống phần mềm" />
+      <img src="/media/cnb-dashboard.jpg" alt="Dashboard CNB ERP với các chỉ số cơ hội, dự án và công việc" />
       <div className="visual-photo-shade" />
       <div className="visual-photo-caption"><span className="visual-photo-index">01 / 03</span><div><strong>Systems that work in context.</strong><span>Business data / AI layer / human decisions</span></div></div>
     </div>
