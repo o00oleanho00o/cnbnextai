@@ -1,16 +1,675 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0d0c" />
-    <meta name="description" content="CNB Next AI xây AI, phần mềm và hệ thống cho những bài toán vận hành thực tế." />
-    <meta property="og:title" content="CNB Next AI — AI, phần mềm và hệ thống" />
-    <meta property="og:description" content="Xây các sản phẩm và nền tảng kết hợp AI, dữ liệu và quy trình vận hành." />
-    <title>CNB Next AI — AI, phần mềm và hệ thống</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNB Next AI — AI, phần mềm và hệ thống</title>
+<meta name="description" content="CNB Next AI xây phần mềm và nền tảng kết hợp AI, dữ liệu và quy trình cho những bài toán thật của doanh nghiệp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05060a;
+  --bg-2:#0a0c14;
+  --panel:rgba(255,255,255,.035);
+  --panel-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --fg:#eef0f6;
+  --muted:#8b91a5;
+  --dim:#5a6074;
+  --c1:#ff7a45;   /* coral - giữ màu thương hiệu cũ */
+  --c2:#c084fc;   /* violet */
+  --c3:#38bdf8;   /* cyan */
+  --ok:#4ade80;
+  --grad:linear-gradient(100deg,var(--c1) 0%,var(--c2) 48%,var(--c3) 100%);
+  --sans:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:20px;
+  --max:1240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--c2);color:#000}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- background layers ---------- */
+.bg-grid{position:fixed;inset:0;z-index:-3;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 75%);
+  opacity:.55}
+.aurora{position:fixed;z-index:-2;border-radius:50%;filter:blur(120px);opacity:.35;pointer-events:none}
+.aurora.a1{width:620px;height:620px;background:var(--c2);top:-260px;left:-120px;animation:float1 22s ease-in-out infinite}
+.aurora.a2{width:520px;height:520px;background:var(--c3);top:-180px;right:-160px;animation:float2 26s ease-in-out infinite}
+.aurora.a3{width:420px;height:420px;background:var(--c1);top:320px;left:40%;opacity:.18;animation:float1 30s ease-in-out infinite reverse}
+@keyframes float1{50%{transform:translate(80px,60px) scale(1.1)}}
+@keyframes float2{50%{transform:translate(-90px,80px) scale(.9)}}
+#net{position:absolute;inset:0;z-index:-1;width:100%;height:100%}
+.noise{position:fixed;inset:0;z-index:100;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:50;width:min(calc(100% - 32px),var(--max));
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 10px 10px 20px;
+  border:1px solid var(--line);border-radius:999px;background:rgba(8,9,14,.6);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:var(--grad);display:grid;place-items:center;color:#05060a;font-size:11px;font-weight:800;font-family:var(--mono);box-shadow:0 0 24px rgba(192,132,252,.45)}
+.logo small{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.12em}
+.nav ul{display:flex;gap:4px;list-style:none}
+.nav ul a{display:block;padding:8px 14px;border-radius:999px;font-size:14px;color:var(--muted);transition:.2s}
+.nav ul a:hover{color:var(--fg);background:var(--panel-2)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:0;white-space:nowrap}
+.btn-primary{background:var(--fg);color:#05060a}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 40px rgba(192,132,252,.45)}
+.btn-ghost{border:1px solid var(--line-2);color:var(--fg)}
+.btn-ghost:hover{background:var(--panel-2)}
+.btn .arr{transition:transform .2s}
+.btn:hover .arr{transform:translateX(3px)}
+.nav .btn{padding:10px 18px}
+.burger{display:none;background:none;border:0;color:var(--fg);padding:8px}
+.nav-r{display:flex;align-items:center;gap:8px}
+.lang{position:relative;display:flex;padding:3px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03)}
+.lang button{position:relative;z-index:1;background:none;border:0;color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;padding:7px 11px;border-radius:999px;cursor:pointer;transition:color .25s}
+.lang button[aria-pressed="true"]{color:#05060a}
+.lang .knob{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:var(--grad);box-shadow:0 0 18px rgba(192,132,252,.45);transition:transform .35s cubic-bezier(.2,.7,.1,1)}
+.lang[data-l="en"] .knob{transform:translateX(100%)}
+[data-i]{transition:opacity .25s}
+.swap [data-i]{opacity:0}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100vh;padding:150px 0 80px;display:flex;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 8px;border:1px solid var(--line-2);border-radius:999px;background:var(--panel);color:var(--muted)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-size:clamp(44px,6.6vw,92px);line-height:1.02;letter-spacing:-.045em;font-weight:700;margin:28px 0 24px}
+h1 .line{display:block;overflow:hidden;padding-bottom:.08em}
+h1 .line span{display:inline-block;transform:translateY(110%);animation:rise .9s cubic-bezier(.2,.7,.1,1) forwards}
+h1 .line:nth-child(2) span{animation-delay:.12s}
+@keyframes rise{to{transform:none}}
+.lead{font-size:clamp(17px,1.5vw,20px);color:var(--muted);max-width:540px;font-weight:300}
+.lead b{color:var(--fg);font-weight:500}
+.cta-row{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px;border-top:1px solid var(--line);max-width:540px}
+.stat{padding:20px 0 0}
+.stat strong{display:block;font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* console */
+.console{position:relative;border-radius:var(--r);background:linear-gradient(180deg,rgba(18,20,32,.9),rgba(8,9,14,.92));border:1px solid var(--line-2);box-shadow:0 40px 120px -20px rgba(124,92,255,.35),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.console::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:var(--grad);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.55;pointer-events:none}
+.c-head{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.c-head i{width:10px;height:10px;border-radius:50%;background:#2a2d3a}
+.c-head .t{margin-left:10px;color:var(--muted);font-family:var(--mono);font-size:12px}
+.c-head .live{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--ok)}
+.c-head .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.4s infinite}
+.c-body{padding:20px;font-family:var(--mono);font-size:13px;line-height:1.85;min-height:330px}
+.c-body .ln{opacity:0;transform:translateY(4px);transition:.35s;white-space:pre-wrap}
+.c-body .ln.show{opacity:1;transform:none}
+.k-cmd{color:var(--fg)}.k-p{color:var(--c2)}.k-tool{color:var(--c3)}.k-ok{color:var(--ok)}.k-warn{color:var(--c1)}.k-dim{color:var(--dim)}
+.caret{display:inline-block;width:8px;height:15px;background:var(--fg);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.c-foot{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.c-foot>div{padding:14px 18px;border-right:1px solid var(--line)}
+.c-foot>div:last-child{border-right:0}
+.c-foot b{display:block;font-size:13px;font-weight:500}
+.c-foot span{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em}
+.bar{height:3px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width 1.2s cubic-bezier(.2,.7,.1,1)}
+
+/* ---------- marquee ---------- */
+.marquee{border-block:1px solid var(--line);overflow:hidden;padding:22px 0;background:rgba(255,255,255,.015)}
+.track{display:flex;gap:48px;width:max-content;animation:scroll 32s linear infinite}
+.track span{font-size:clamp(20px,2.4vw,30px);font-weight:600;letter-spacing:-.02em;color:var(--dim);display:flex;align-items:center;gap:48px}
+.track span em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section{position:relative}
+.sec{padding:140px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--muted)}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--grad)}
+h2{font-size:clamp(34px,4.4vw,60px);line-height:1.08;letter-spacing:-.04em;font-weight:600;margin:20px 0 20px}
+.sec-head{display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:end;margin-bottom:64px}
+.sec-head p{color:var(--muted);font-size:18px;font-weight:300}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.card{position:relative;grid-column:span 2;padding:32px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line);overflow:hidden;transition:border-color .3s,transform .3s;isolation:isolate}
+.card::after{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .3s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(192,132,252,.16),transparent 60%)}
+.card:hover{border-color:var(--line-2);transform:translateY(-3px)}
+.card:hover::after{opacity:1}
+.card.wide{grid-column:span 3}
+.card .num{position:absolute;top:28px;right:28px;color:var(--dim)}
+.ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line-2);margin-bottom:56px}
+.ico svg{width:22px;height:22px;stroke:url(#g);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:10px}
+.card p{color:var(--muted);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.chips span{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
+
+/* work */
+.work{display:grid;gap:16px}
+.w-item{display:grid;grid-template-columns:1fr 1.1fr;border-radius:24px;border:1px solid var(--line);background:var(--panel);overflow:hidden;transition:border-color .3s}
+.w-item:hover{border-color:var(--line-2)}
+.w-item:nth-child(even){grid-template-columns:1.1fr 1fr}
+.w-item:nth-child(even) .w-text{order:2}
+.w-text{padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.w-text .top{display:flex;justify-content:space-between;color:var(--muted)}
+.w-text h3{font-size:clamp(30px,3.4vw,46px);font-weight:600;letter-spacing:-.035em;line-height:1.05;margin-bottom:14px}
+.w-text p{color:var(--muted);font-size:17px;max-width:420px}
+.w-tags{display:flex;gap:8px;flex-wrap:wrap}
+.w-tags span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line)}
+.w-vis{position:relative;min-height:380px;background:radial-gradient(ellipse at 30% 20%,rgba(192,132,252,.18),transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(56,189,248,.15),transparent 55%),var(--bg-2);border-left:1px solid var(--line);overflow:hidden}
+.w-item:nth-child(even) .w-vis{border-left:0;border-right:1px solid var(--line)}
+.w-vis svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+.steps::before{content:"";position:absolute;top:27px;left:28px;right:28px;height:1px;background:var(--line-2)}
+.steps .prog{position:absolute;top:27px;left:28px;height:1px;width:0;background:var(--grad);box-shadow:0 0 12px var(--c2);transition:width 2s cubic-bezier(.2,.7,.1,1)}
+.step{position:relative;padding-top:80px}
+.step .node{position:absolute;top:0;left:0;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line-2);font-family:var(--mono);font-size:13px;color:var(--muted);transition:.5s}
+.step.on .node{border-color:transparent;background:var(--grad);color:#05060a;font-weight:600;box-shadow:0 0 30px rgba(192,132,252,.5)}
+.step h3{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.step p{color:var(--muted);font-size:15px;max-width:240px}
+
+/* cta */
+.cta{position:relative;border-radius:32px;padding:96px 48px;text-align:center;overflow:hidden;border:1px solid var(--line-2);
+  background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(192,132,252,.35),transparent 70%),radial-gradient(ellipse 40% 60% at 15% 0%,rgba(255,122,69,.18),transparent 70%),radial-gradient(ellipse 40% 60% at 85% 0%,rgba(56,189,248,.18),transparent 70%),var(--bg-2)}
+.cta h2{font-size:clamp(38px,5.4vw,76px);margin:20px auto 20px;max-width:900px}
+.cta p{color:var(--muted);font-size:18px;max-width:520px;margin:0 auto 40px;font-weight:300}
+.mail{display:inline-flex;align-items:center;gap:14px;padding:18px 28px;border-radius:999px;background:var(--fg);color:#05060a;font-weight:600;font-size:clamp(16px,2vw,20px);transition:.25s}
+.mail:hover{box-shadow:0 10px 60px rgba(192,132,252,.6);transform:translateY(-2px)}
+.copy{display:block;margin:16px auto 0;background:none;border:0;color:var(--muted);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.08em}
+.copy:hover{color:var(--fg)}
+
+footer{padding:56px 0 40px;color:var(--dim);font-size:13px}
+.f-row{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:32px}
+.f-big{font-size:clamp(60px,15vw,220px);font-weight:800;letter-spacing:-.06em;line-height:.85;text-align:center;margin-bottom:48px;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0));-webkit-background-clip:text;background-clip:text;color:transparent;user-select:none}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.1,1),transform .9s cubic-bezier(.2,.7,.1,1)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .hero-grid,.sec-head{grid-template-columns:1fr}
+  .hero{padding-top:130px}
+  .card,.card.wide{grid-column:span 3}
+  .w-item,.w-item:nth-child(even){grid-template-columns:1fr}
+  .w-item:nth-child(even) .w-text{order:0}
+  .w-vis,.w-item:nth-child(even) .w-vis{min-height:260px;border:0;border-top:1px solid var(--line)}
+  .steps{grid-template-columns:1fr 1fr;row-gap:48px}
+  .steps::before,.steps .prog{display:none}
+}
+@media (max-width:720px){
+  .wrap{padding:0 16px}
+  .nav ul{display:none}
+  .nav ul.open{display:flex;flex-direction:column;position:absolute;top:calc(100% + 8px);left:0;right:0;padding:8px;border-radius:20px;background:rgba(8,9,14,.95);border:1px solid var(--line)}
+  .burger{display:block}
+  .nav-r{margin-left:auto}
+  .nav .btn{display:none}
+  .sec{padding:96px 0}
+  .card,.card.wide{grid-column:span 6}
+  .ico{margin-bottom:32px}
+  .w-text{padding:28px}
+  .steps{grid-template-columns:1fr}
+  .cta{padding:64px 20px;border-radius:24px}
+  .c-body{font-size:11.5px;min-height:300px}
+  .stat strong{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  h1 .line span{transform:none}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a45"/><stop offset=".5" stop-color="#c084fc"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>
+</svg>
+
+<div class="bg-grid"></div>
+<div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
+<div class="noise"></div>
+
+<nav class="nav">
+  <a href="#top" class="logo"><span class="logo-mark">CNB</span>CNB <small>NEXT AI</small></a>
+  <ul id="menu">
+    <li><a href="#nang-luc" data-i="nav1">Năng lực</a></li>
+    <li><a href="#case-study" data-i="nav2">Case study</a></li>
+    <li><a href="#cach-lam" data-i="nav3">Cách làm</a></li>
+    <li><a href="#lien-he" data-i="nav4">Liên hệ</a></li>
+  </ul>
+  <div class="nav-r">
+    <div class="lang" id="lang" data-l="vi" role="group" aria-label="Ngôn ngữ / Language">
+      <span class="knob"></span>
+      <button type="button" data-set="vi" aria-pressed="true">VI</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <a href="#lien-he" class="btn btn-primary"><span data-i="navcta">Trao đổi</span> <span class="arr">→</span></a>
+    <button class="burger" aria-label="Menu" onclick="document.getElementById('menu').classList.toggle('open')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h16M4 16h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+  <canvas id="net"></canvas>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill mono"><span class="dot"></span>AI Systems / Hanoi / Est. 2025</span>
+      <h1>
+        <span class="line"><span data-i="h1a">Xây hệ thống AI</span></span>
+        <span class="line"><span class="grad-text" data-i="h1b">vận hành được.</span></span>
+      </h1>
+      <p class="lead" data-i="lead">CNB Next AI xây <b>phần mềm và nền tảng</b> kết hợp <b>AI, dữ liệu và quy trình</b> cho những bài toán thật của doanh nghiệp.</p>
+      <div class="cta-row">
+        <a href="#lien-he" class="btn btn-primary"><span data-i="cta1">Đặt bài toán</span> <span class="arr">→</span></a>
+        <a href="#nang-luc" class="btn btn-ghost" data-i="cta2">Xem năng lực</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong class="grad-text">01</strong><span data-i="st1">Ý tưởng đến hệ thống</span></div>
+        <div class="stat"><strong>06</strong><span data-i="st2">Năng lực AI &amp; software</span></div>
+        <div class="stat"><strong>∞</strong><span data-i="st3">Không gian để mở rộng</span></div>
+      </div>
+    </div>
+
+    <div class="console rv" id="console" aria-label="Minh họa một agent đang chạy">
+      <div class="c-head"><i></i><i></i><i></i><span class="t">cnb://agent-runtime</span><span class="live">LIVE</span></div>
+      <div class="c-body" id="term"></div>
+      <div class="c-foot">
+        <div><span>BUSINESS DATA</span><b>Ingest</b><div class="bar"><i data-w="100%"></i></div></div>
+        <div><span>AI LAYER</span><b>Reason</b><div class="bar"><i data-w="78%"></i></div></div>
+        <div><span>HUMAN</span><b>Decide</b><div class="bar"><i data-w="42%"></i></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <span>AI SYSTEMS <em>✳</em> SOFTWARE ENGINEERING <em>✳</em> INDUSTRIAL INTELLIGENCE <em>✳</em> DATA &amp; WORKFLOW <em>✳</em></span>
+    <span>AI SYSTEMS <em>✳</em> SOFTWARE ENGINEERING <em>✳</em> INDUSTRIAL INTELLIGENCE <em>✳</em> DATA &amp; WORKFLOW <em>✳</em></span>
+  </div>
+</div>
+
+<!-- WHAT WE BUILD -->
+<section class="sec" id="nang-luc">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <span class="eyebrow mono">What we build</span>
+        <h2 data-i="s1h">Một lớp công nghệ mới<br>cho cách <span class="grad-text">doanh nghiệp vận hành.</span></h2>
+      </div>
+      <p data-i="s1p">Không bắt đầu từ một mô hình. Chúng tôi bắt đầu từ quy trình, dữ liệu và quyết định cần được làm tốt hơn.</p>
+    </div>
+
+    <div class="bento">
+      <article class="card wide rv">
+        <span class="num mono">01</span>
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/></svg></div>
+        <h3>Business AI</h3>
+        <p data-i="c1">Company OS, quotation, dossier và các workflow có evidence, approval, audit.</p>
+        <div class="chips"><span>evidence</span><span>approval</span><span>audit</span></div>
+      </article>
+      <article class="card wide rv">
+        <span class="num mono">02</span>
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></div>
+        <h3>AI agents</h3>
+        <p data-i="c2">Agent có tools, memory, policy và ranh giới rõ ràng để chạy trong thực tế.</p>
+        <div class="chips"><span>tools</span><span>memory</span><span>policy</span></div>
+      </article>
+      <article class="card rv">
+        <span class="num mono">03</span>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 21V9l6 4V9l6 4V5l6 4v12z"/><path d="M7 17h2M12 17h2M17 17h2"/></svg></div>
+        <h3>Industrial systems</h3>
+        <p data-i="c3">Đưa AI vào thiết bị, production cell, CAD, BOM và vận hành kỹ thuật.</p>
+      </article>
+      <article class="card rv">
+        <span class="num mono">04</span>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
+        <h3>Data intelligence</h3>
+        <p data-i="c4">Biến PDF, Excel, DOCX và dữ liệu rời rạc thành đầu vào có cấu trúc.</p>
+      </article>
+      <article class="card rv">
+        <span class="num mono">05</span>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/></svg></div>
+        <h3>ERP &amp; operations</h3>
+        <p data-i="c5">ERP, CRM, procurement và công cụ vận hành được thiết kế theo nghiệp vụ.</p>
+      </article>
+      <article class="card wide rv" style="grid-column:span 6">
+        <span class="num mono">06</span>
+        <div style="display:flex;gap:32px;align-items:flex-end;flex-wrap:wrap;justify-content:space-between">
+          <div>
+            <div class="ico" style="margin-bottom:32px"><svg viewBox="0 0 24 24"><path d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6z"/></svg></div>
+            <h3>AI products</h3>
+            <p style="max-width:520px" data-i="c6">Từ giáo dục, media đến sản phẩm theo ngành, xây nhanh nhưng có nền tảng.</p>
+          </div>
+          <div class="chips" style="margin:0"><span>education</span><span>media</span><span>voice</span><span>video</span><span>vertical AI</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- SELECTED WORK -->
+<section class="sec" id="case-study" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <span class="eyebrow mono">Selected work</span>
+        <h2 data-i="s2h">Từ research đến<br><span class="grad-text">thứ có thể chạy.</span></h2>
+      </div>
+      <p data-i="s2p">Một vài hướng chúng tôi đang biến thành sản phẩm, nền tảng và năng lực triển khai.</p>
+    </div>
+
+    <div class="work">
+      <article class="w-item rv">
+        <div class="w-text">
+          <div class="top mono"><span>01 / 03</span><span>Business AI</span></div>
+          <div><h3>Company OS</h3><p data-i="w1">Nền tảng điều phối quotation, tender và tài liệu dự án cho doanh nghiệp.</p></div>
+          <div class="w-tags"><span>EVIDENCE</span><span>APPROVAL</span><span>TRACEABILITY</span></div>
+        </div>
+        <div class="w-vis">
+          <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice">
+            <g fill="none" stroke="rgba(255,255,255,.12)">
+              <rect x="70" y="70" width="150" height="190" rx="12"/><rect x="90" y="50" width="150" height="190" rx="12" fill="rgba(10,12,20,.9)"/>
+              <path d="M110 90h90M110 110h110M110 130h70M110 160h100M110 180h80"/>
+            </g>
+            <path d="M240 150 C300 150 300 110 360 110" stroke="url(#g)" stroke-width="1.5" fill="none" stroke-dasharray="4 6"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/></path>
+            <path d="M240 150 C300 150 300 200 360 200" stroke="url(#g)" stroke-width="1.5" fill="none" stroke-dasharray="4 6"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/></path>
+            <path d="M240 150 C300 150 300 290 360 290" stroke="url(#g)" stroke-width="1.5" fill="none" stroke-dasharray="4 6"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/></path>
+            <g font-family="JetBrains Mono,monospace" font-size="12" fill="#eef0f6">
+              <rect x="360" y="90" width="170" height="40" rx="20" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)"/><circle cx="382" cy="110" r="5" fill="#4ade80"/><text x="396" y="114">evidence ✓</text>
+              <rect x="360" y="180" width="170" height="40" rx="20" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)"/><circle cx="382" cy="200" r="5" fill="#ff7a45"><animate attributeName="opacity" values="1;.3;1" dur="1.6s" repeatCount="indefinite"/></circle><text x="396" y="204">approval…</text>
+              <rect x="360" y="270" width="170" height="40" rx="20" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)"/><circle cx="382" cy="290" r="5" fill="#38bdf8"/><text x="396" y="294">audit trail</text>
+            </g>
+          </svg>
+        </div>
+      </article>
+
+      <article class="w-item rv">
+        <div class="w-text">
+          <div class="top mono"><span>02 / 03</span><span>Industrial AI</span></div>
+          <div><h3>Engineering systems</h3><p data-i="w2">AI workflow kết nối operator, thiết bị, CAD và các policy an toàn.</p></div>
+          <div class="w-tags"><span>CAD</span><span>BOM</span><span>SAFETY</span></div>
+        </div>
+        <div class="w-vis">
+          <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice">
+            <g stroke="rgba(56,189,248,.18)" fill="none">
+              <path d="M0 80h600M0 160h600M0 240h600M0 320h600M100 0v400M200 0v400M300 0v400M400 0v400M500 0v400" stroke-dasharray="2 4"/>
+            </g>
+            <g fill="none" stroke="url(#g)" stroke-width="1.6">
+              <path d="M180 300 L300 230 L420 300 L300 370 Z"/>
+              <path d="M180 300 V180 L300 110 L420 180 V300"/>
+              <path d="M300 230 V110"/>
+              <path d="M180 180 L300 250 L420 180" opacity=".35"/>
+            </g>
+            <g font-family="JetBrains Mono,monospace" font-size="11" fill="#8b91a5">
+              <path d="M420 180 h60" stroke="#8b91a5"/><text x="486" y="184">BOM · 128 items</text>
+              <path d="M180 180 h-50" stroke="#8b91a5"/><text x="40" y="184">CAD.dwg</text>
+              <path d="M300 370 v20" stroke="#8b91a5"/><text x="248" y="396">policy: safe ✓</text>
+            </g>
+            <circle r="4" fill="#fff"><animateMotion dur="5s" repeatCount="indefinite" path="M180 300 L300 230 L420 300 L300 370 Z"/></circle>
+          </svg>
+        </div>
+      </article>
+
+      <article class="w-item rv">
+        <div class="w-text">
+          <div class="top mono"><span>03 / 03</span><span>AI Product Studio</span></div>
+          <div><h3>Products people use</h3><p data-i="w3">Studio cho giáo dục, truyện, voice và video với trải nghiệm trọn vẹn.</p></div>
+          <div class="w-tags"><span>PROTOTYPE</span><span>PRODUCT</span><span>EXPERIENCE</span></div>
+        </div>
+        <div class="w-vis">
+          <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" id="wave">
+            <g id="bars"></g>
+            <g fill="none" stroke="rgba(255,255,255,.14)">
+              <rect x="200" y="60" width="200" height="120" rx="14" fill="rgba(10,12,20,.85)"/>
+              <path d="M285 100 l40 20 -40 20z" fill="url(#g)" stroke="none"/>
+            </g>
+            <g font-family="JetBrains Mono,monospace" font-size="11" fill="#8b91a5"><text x="200" y="205">voice · story · video · edu</text></g>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW WE WORK -->
+<section class="sec" id="cach-lam" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <span class="eyebrow mono">How we work</span>
+        <h2 data-i="s3h">Rõ bài toán.<br><span class="grad-text">Chắc hệ thống.</span></h2>
+      </div>
+      <p data-i="s3p">AI chỉ có giá trị khi được đặt đúng chỗ trong một hệ thống có thể hiểu, kiểm tra và cải tiến.</p>
+    </div>
+    <div class="steps" id="steps">
+      <div class="prog" id="prog"></div>
+      <div class="step"><span class="node">01</span><h3>Understand</h3><p data-i="p1">Nghiệp vụ, dữ liệu, ràng buộc và rủi ro.</p></div>
+      <div class="step"><span class="node">02</span><h3>Model</h3><p data-i="p2">Domain model, workflow và contract rõ ràng.</p></div>
+      <div class="step"><span class="node">03</span><h3>Build</h3><p data-i="p3">Một slice chạy được, có AI boundary và guardrails.</p></div>
+      <div class="step"><span class="node">04</span><h3>Prove</h3><p data-i="p4">Test, trace và review trên luồng dùng đại diện.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec" id="lien-he" style="padding-top:40px">
+  <div class="wrap">
+    <div class="cta rv">
+      <span class="eyebrow mono">Let's build the next layer</span>
+      <h2 data-i="s4h">Có một quy trình<br>cần thành <span class="grad-text">hệ thống?</span></h2>
+      <p data-i="s4p">Hãy kể cho chúng tôi điều đang làm chậm đội ngũ của bạn. Một email đủ để bắt đầu.</p>
+      <a class="mail" href="mailto:anhlq@cnbnextai.com">anhlq@cnbnextai.com <span>↗</span></a>
+      <button class="copy" id="copy" data-i="copy">[ SAO CHÉP EMAIL ]</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-big">CNB NEXT AI</div>
+    <div class="f-row">
+      <span data-i="foot">© 2025 CNB Next AI · Số 7 ngách 86/48, Nghĩa Lộ, Hà Nội</span>
+      <span class="mono">AI / Software / Systems</span>
+      <a href="mailto:anhlq@cnbnextai.com">anhlq@cnbnextai.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- neural network canvas ---- */
+  const cv = document.getElementById('net'), ctx = cv.getContext('2d');
+  let W, H, pts = [], mouse = {x: -999, y: -999}, dpr = Math.min(devicePixelRatio || 1, 2);
+  function size() {
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.min(110, Math.floor(W * H / 14000));
+    pts = Array.from({length: n}, () => ({x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35, r: Math.random()*1.6+.4}));
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      const dx = mouse.x - p.x, dy = mouse.y - p.y, d = Math.hypot(dx, dy);
+      if (d < 180) { p.x += dx * .006; p.y += dy * .006; }
+    }
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      for (let j = i + 1; j < pts.length; j++) {
+        const b = pts[j], d = Math.hypot(a.x-b.x, a.y-b.y);
+        if (d < 130) { ctx.strokeStyle = `rgba(192,132,252,${(1-d/130)*.22})`; ctx.lineWidth = .6; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+      }
+      const md = Math.hypot(a.x-mouse.x, a.y-mouse.y);
+      if (md < 180) { ctx.strokeStyle = `rgba(56,189,248,${(1-md/180)*.5})`; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke(); }
+      ctx.fillStyle = 'rgba(238,240,246,.7)'; ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 7); ctx.fill();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  size(); draw();
+  addEventListener('resize', size);
+  cv.parentElement.addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  cv.parentElement.addEventListener('mouseleave', () => mouse.x = mouse.y = -999);
+
+  /* ---- agent console ---- */
+  const L = [
+    ['<span class="k-p">❯</span> <span class="k-cmd">agent.run</span>(<span class="k-warn">"quotation_review"</span>)', 400],
+    ['<span class="k-dim">  context  ·</span> tender_pack.pdf · bom.xlsx · spec.docx', 700],
+    ['<span class="k-tool">  ⚙ tool</span>   extract_structured(<span class="k-dim">3 files</span>)', 700],
+    ['<span class="k-ok">  ✓</span> 214 line items → schema', 600],
+    ['<span class="k-tool">  ⚙ tool</span>   match_catalog(<span class="k-dim">bom</span>)', 700],
+    ['<span class="k-ok">  ✓</span> evidence linked · 98% traced', 600],
+    ['<span class="k-tool">  ⚙ policy</span> margin_guardrail', 700],
+    ['<span class="k-warn">  ⚠</span> 3 items need human decision', 700],
+    ['<span class="k-p">  →</span> approval request sent <span class="k-dim">· audit #A-0412</span>', 700],
+    ['<span class="k-p">❯</span> <span class="caret"></span>', 0]
+  ];
+  const term = document.getElementById('term');
+  const bars = document.querySelectorAll('.bar i');
+  async function play() {
+    term.innerHTML = ''; bars.forEach(b => b.style.width = 0);
+    for (let i = 0; i < L.length; i++) {
+      const d = document.createElement('div'); d.className = 'ln'; d.innerHTML = L[i][0]; term.appendChild(d);
+      requestAnimationFrame(() => d.classList.add('show'));
+      if (i === 3) bars[0].style.width = bars[0].dataset.w;
+      if (i === 6) bars[1].style.width = bars[1].dataset.w;
+      if (i === 8) bars[2].style.width = bars[2].dataset.w;
+      await new Promise(r => setTimeout(r, reduce ? 0 : L[i][1]));
+    }
+    if (!reduce) setTimeout(play, 6000);
+  }
+  play();
+
+  /* ---- spotlight cards ---- */
+  document.querySelectorAll('.card').forEach(c => c.addEventListener('mousemove', e => {
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }));
+
+  /* ---- audio wave bars ---- */
+  const g = document.getElementById('bars'), N = 48, rects = [];
+  for (let i = 0; i < N; i++) {
+    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    r.setAttribute('x', 60 + i * 10.2); r.setAttribute('width', 5); r.setAttribute('rx', 2.5);
+    r.setAttribute('fill', 'url(#g)'); r.setAttribute('opacity', .75); g.appendChild(r); rects.push(r);
+  }
+  let t = 0;
+  (function wave() {
+    t += .05;
+    rects.forEach((r, i) => {
+      const h = 14 + Math.abs(Math.sin(i * .35 + t) * Math.cos(i * .12 - t * .6)) * 110;
+      r.setAttribute('y', 300 - h / 2); r.setAttribute('height', h);
+    });
+    if (!reduce) requestAnimationFrame(wave);
+  })();
+
+  /* ---- reveal + steps ---- */
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold: .15});
+  document.querySelectorAll('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 3) * 80 + 'ms'; io.observe(el); });
+  const steps = document.querySelectorAll('.step'), prog = document.getElementById('prog');
+  new IntersectionObserver(es => {
+    if (!es[0].isIntersecting) return;
+    prog.style.width = 'calc(100% - 56px)';
+    steps.forEach((s, i) => setTimeout(() => s.classList.add('on'), 250 + i * 450));
+  }, {threshold: .4}).observe(document.getElementById('steps'));
+
+  /* ---- song ngữ VI / EN ---- */
+  const EN = {
+    nav1: 'Capabilities', nav2: 'Case studies', nav3: 'Approach', nav4: 'Contact', navcta: "Let's talk",
+    h1a: 'AI systems', h1b: 'that actually run.',
+    lead: 'CNB Next AI builds <b>software and platforms</b> that combine <b>AI, data and workflows</b> to solve real business problems.',
+    cta1: 'Bring us a problem', cta2: 'See capabilities',
+    st1: 'From idea to system', st2: 'AI &amp; software capabilities', st3: 'Room to scale',
+    s1h: 'A new technology layer<br>for how <span class="grad-text">businesses operate.</span>',
+    s1p: "We don't start from a model. We start from the processes, data and decisions that need to get better.",
+    c1: 'Company OS, quotations, dossiers and workflows with evidence, approval and audit.',
+    c2: 'Agents with tools, memory, policy and clear boundaries — built to run in the real world.',
+    c3: 'Bringing AI into equipment, production cells, CAD, BOM and engineering operations.',
+    c4: 'Turning PDF, Excel, DOCX and scattered data into structured input.',
+    c5: 'ERP, CRM, procurement and operations tools designed around how the business actually works.',
+    c6: 'From education and media to vertical products — built fast, on solid foundations.',
+    s2h: 'From research to<br><span class="grad-text">things that run.</span>',
+    s2p: 'A few directions we are turning into products, platforms and delivery capabilities.',
+    w1: 'A platform that orchestrates quotations, tenders and project documents for businesses.',
+    w2: 'AI workflows connecting operators, equipment, CAD and safety policies.',
+    w3: 'A studio for education, stories, voice and video — with complete, polished experiences.',
+    s3h: 'Clear problem.<br><span class="grad-text">Solid system.</span>',
+    s3p: 'AI only creates value when it is placed correctly inside a system that can be understood, verified and improved.',
+    p1: 'Business, data, constraints and risks.',
+    p2: 'Domain model, workflows and clear contracts.',
+    p3: 'A working slice with AI boundaries and guardrails.',
+    p4: 'Test, trace and review on representative flows.',
+    s4h: 'Have a process<br>that should become a <span class="grad-text">system?</span>',
+    s4p: "Tell us what's slowing your team down. One email is enough to start.",
+    copy: '[ COPY EMAIL ]', copied: '[ COPIED ✓ ]',
+    foot: '© 2025 CNB Next AI · 7/86/48 Nghia Lo, Hanoi, Vietnam',
+    title: 'CNB Next AI — AI, software and systems',
+    desc: 'CNB Next AI builds software and platforms that combine AI, data and workflows to solve real business problems.',
+    console: 'Illustration of an AI agent at work'
+  };
+  const VI = {copied: '[ ĐÃ SAO CHÉP ✓ ]', title: document.title,
+    desc: document.querySelector('meta[name=description]').content,
+    console: document.getElementById('console').getAttribute('aria-label')};
+  document.querySelectorAll('[data-i]').forEach(el => VI[el.dataset.i] = el.innerHTML);
+  const I18N = {vi: VI, en: EN};
+  const sw = document.getElementById('lang');
+  let cur = 'vi';
+
+  function setLang(l, animate) {
+    if (!I18N[l]) l = 'vi';
+    const apply = () => {
+      document.querySelectorAll('[data-i]').forEach(el => { const v = I18N[l][el.dataset.i]; if (v != null) el.innerHTML = v; });
+      document.documentElement.lang = l;
+      document.title = I18N[l].title;
+      document.querySelector('meta[name=description]').content = I18N[l].desc;
+      document.getElementById('console').setAttribute('aria-label', I18N[l].console);
+      sw.dataset.l = l;
+      sw.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.set === l));
+      document.body.classList.remove('swap');
+    };
+    cur = l;
+    try { localStorage.setItem('cnb-lang', l); } catch (e) {}
+    if (animate && !reduce) { document.body.classList.add('swap'); setTimeout(apply, 220); } else apply();
+  }
+  sw.querySelectorAll('button').forEach(b => b.onclick = () => b.dataset.set !== cur && setLang(b.dataset.set, true));
+
+  let saved = new URLSearchParams(location.search).get('lang');
+  if (!saved) { try { saved = localStorage.getItem('cnb-lang'); } catch (e) {} }
+  if (saved && saved !== 'vi') setLang(saved, false);
+
+  /* ---- copy email ---- */
+  document.getElementById('copy').onclick = e => {
+    navigator.clipboard?.writeText('anhlq@cnbnextai.com').then(() => { e.target.textContent = I18N[cur].copied; setTimeout(() => e.target.innerHTML = I18N[cur].copy, 1800); });
+  };
+
+  /* close mobile menu on click */
+  document.querySelectorAll('#menu a').forEach(a => a.onclick = () => document.getElementById('menu').classList.remove('open'));
+})();
+</script>
+</body>
 </html>
